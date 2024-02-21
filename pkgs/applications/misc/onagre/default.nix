@@ -5,6 +5,8 @@
 , pkgconf
 , freetype
 , expat
+, xorg
+, pop-launcher
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -29,6 +31,11 @@ rustPlatform.buildRustPackage rec {
 
   nativeBuildInputs = [ cmake pkgconf ];
   buildInputs = [ freetype expat ];
+
+  libs = with xorg; pkgs.lib.makeLibraryPath [libX11 libXcursor libXrandr libXi];
+  postInstall = ''
+    wrapProgram $out/bin/onagre --prefix LD_LIBRARY_PATH : $libs --prefix PATH : ${pop-launcher}/bin
+  '';
 
   meta = with lib; {
     description = "A general purpose application launcher for X and wayland inspired by rofi/wofi and alfred";
